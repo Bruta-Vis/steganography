@@ -1,6 +1,6 @@
 # Stegonography Guide
 
-This readme shows how to hide a text file inside a **lossless** image (e.g., PNG) using the provided `image_lsb.py` script.
+Hide a text file inside a **lossless** image (e.g., PNG) using the provided `image_lsb.py` script.
 
 ## Definitions
 
