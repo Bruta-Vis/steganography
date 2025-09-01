@@ -3,17 +3,20 @@ import numpy as np
 import struct
 from pathlib import Path
 
-MAGIC = b"STEG1"          # 5 bytes
-HEADER_FMT = ">I"          # 4-byte big-endian length
+MAGIC = b"STEG1"  # 5 bytes
+HEADER_FMT = ">I"  # 4-byte big-endian length
+
 
 def _bytes_to_bits(data: bytes):
     for b in data:
         for i in range(8):
             yield (b >> (7 - i)) & 1
 
+
 def _bits_to_bytes(bits_iter, n_bytes: int) -> bytes:
     out = bytearray()
-    val = 0; count = 0
+    val = 0
+    count = 0
     for bit in bits_iter:
         val = (val << 1) | (bit & 1)
         count += 1
@@ -21,8 +24,10 @@ def _bits_to_bytes(bits_iter, n_bytes: int) -> bytes:
             out.append(val)
             if len(out) == n_bytes:
                 return bytes(out)
-            val = 0; count = 0
+            val = 0
+            count = 0
     raise ValueError("Not enough bits to reconstruct bytes")
+
 
 def _flatten_pixels(img: Image.Image) -> np.ndarray:
     if img.mode not in ("RGB", "RGBA"):
@@ -30,6 +35,7 @@ def _flatten_pixels(img: Image.Image) -> np.ndarray:
     arr = np.array(img, dtype=np.uint8)
     flat = arr.reshape(-1)  # Flatten all channels
     return arr, flat
+
 
 def hide(cover_path: str, payload_path: str, out_path: str):
     img = Image.open(cover_path)
@@ -56,6 +62,7 @@ def hide(cover_path: str, payload_path: str, out_path: str):
     Image.fromarray(stego).save(out_path, format="PNG", optimize=False)
     print("Embedded {} bytes into {}".format(len(payload), out_path))
 
+
 def extract(stego_path: str, out_path: str):
     img = Image.open(stego_path)
     arr, flat = _flatten_pixels(img)
@@ -76,8 +83,10 @@ def extract(stego_path: str, out_path: str):
     Path(out_path).write_bytes(payload)
     print("Extracted {} bytes to {}".format(length, out_path))
 
+
 if __name__ == "__main__":
     import argparse
+
     p = argparse.ArgumentParser(description="Simple PNG LSB steganography")
     sub = p.add_subparsers(dest="cmd", required=True)
 
